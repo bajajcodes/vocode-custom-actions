@@ -14,7 +14,8 @@ from vocode.streaming.models.message import BaseMessage
 from vocode.streaming.models.agent import FillerAudioConfig
 from prompt import SENDS_AN_SMS_PROMPT
 from vocode.streaming.action.nylas_send_email import NylasSendEmailActionConfig
-from vocode.streaming.models.transcriber import TimeEndpointingConfig
+from agent_actions.custom_agent import MyChatGPTAgentConfig
+from agent_actions.twilio_send_sms import TwilioSendSmsActionConfig
 
 
 BASE_URL = os.environ["BASE_URL"]
@@ -51,9 +52,8 @@ async def main():
             audio_encoding="mulaw",
             model="nova-2-conversationalai",
             min_interrupt_confidence=1,
-            endpointing_config=TimeEndpointingConfig(),
         ),
-        agent_config=ChatGPTAgentConfig(
+        agent_config=MyChatGPTAgentConfig(
             send_filler_audio=FillerAudioConfig(use_typing_noise=True),
             initial_message=BaseMessage(text="Hello?"),
             prompt_preamble=SENDS_AN_SMS_PROMPT,
@@ -62,7 +62,7 @@ async def main():
             generate_responses=True,
             allow_agent_to_be_cut_off=True,
             track_bot_sentiment=True,
-            actions=[NylasSendEmailActionConfig()],
+            actions=[TwilioSendSmsActionConfig()],
             allowed_idle_time_seconds=5,
             memory=memory,
         )

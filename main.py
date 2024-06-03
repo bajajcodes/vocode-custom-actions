@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from vocode.streaming.models.events import Event, EventType
 from vocode.streaming.models.transcript import (TranscriptCompleteEvent)
 from vocode.streaming.utils import events_manager
+from agent_actions.custom_agent_factory import MyAgentFactory
 
 # if running from python, this will load the local .env
 # docker-compose will load the .env file by itself
@@ -47,6 +48,7 @@ telephony_server = TelephonyServer(
     base_url=BASE_URL,
     config_manager=config_manager,
     logger=logger,
+    agent_factory=MyAgentFactory()
 )
 
 app.include_router(telephony_server.get_router())

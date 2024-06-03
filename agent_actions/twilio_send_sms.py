@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import Type
 from pydantic import BaseModel, Field
 import os
 from vocode.streaming.action.base_action import BaseAction
@@ -6,35 +6,35 @@ from vocode.streaming.models.actions import (
     ActionConfig,
     ActionInput,
     ActionOutput,
-    ActionType,
 )
+from .custom_models import MyActionType
 
 
-class NylasSendEmailActionConfig(ActionConfig, type=ActionType.NYLAS_SEND_EMAIL):
+class TwilioSendSmsActionConfig(ActionConfig, type=MyActionType.TWILIO_SEND_SMS):
     pass
 
 
-class NylasSendEmailParameters(BaseModel):
+class TwilioSendSmsParameters(BaseModel):
     to: str = Field(..., description="The mobile number of the recipient.")
     body: str = Field(..., description="The body of the sms.")
 
 
-class NylasSendEmailResponse(BaseModel):
+class TwilioSendSmsResponse(BaseModel):
     success: bool
 
 
-class NylasSendEmail(
+class TwilioSendSms(
     BaseAction[
-        NylasSendEmailActionConfig, NylasSendEmailParameters, NylasSendEmailResponse
+        TwilioSendSmsActionConfig, TwilioSendSmsParameters, TwilioSendSmsResponse
     ]
 ):
     description: str = "Sends an sms."
-    parameters_type: Type[NylasSendEmailParameters] = NylasSendEmailParameters
-    response_type: Type[NylasSendEmailResponse] = NylasSendEmailResponse
+    parameters_type: Type[TwilioSendSmsParameters] = TwilioSendSmsParameters
+    response_type: Type[TwilioSendSmsResponse] = TwilioSendSmsResponse
 
     async def run(
-        self, action_input: ActionInput[NylasSendEmailParameters]
-    ) -> ActionOutput[NylasSendEmailResponse]:
+        self, action_input: ActionInput[TwilioSendSmsParameters]
+    ) -> ActionOutput[TwilioSendSmsResponse]:
         from twilio.rest import Client
 
         account_sid = os.getenv('TWILIO_ACCOUNT_SID')
@@ -51,5 +51,5 @@ class NylasSendEmail(
 
         return ActionOutput(
             action_type=self.action_config.type,
-            response=NylasSendEmailResponse(success=True),
+            response=TwilioSendSmsResponse(success=True),
         )

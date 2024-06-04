@@ -50,4 +50,12 @@ class SendGridSendEmail(
     except RuntimeError as e:
       logging.error(f"Failed to send Email: {e}")
       return ActionOutput(action_type=self.action_config.type, response=SendGridSendEmailResponse(success=False, message="Failed to send Email"))
+    
+  def _user_message_param_info(self):
+        return {
+            "type": "string",
+            "description": """
+            Let me send the email for you 
+            """,
+        }
   

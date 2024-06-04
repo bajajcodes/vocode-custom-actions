@@ -58,3 +58,12 @@ class TwilioSendSms(
         except RuntimeError as e:
             logging.error(f"Failed to send SMS: {e}")
             return ActionOutput(action_type=self.action_config.type, response=TwilioSendSmsResponse(success=False, message="Failed to send SMS"))
+
+    def _user_message_param_info(self):
+        return {
+            "type": "string",
+            "description": """
+            Let me send the sms for you
+            """,
+        }
+    

@@ -12,6 +12,7 @@ twilio = "^8.1.0"
 vocode = "0.1.111"
 vonage = "^3.5.1"
 python-dotenv = "^1.0.0"
+sendgrid = "^6.11.0"
 
 
 [build-system]

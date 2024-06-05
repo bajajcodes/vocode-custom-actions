@@ -10,6 +10,10 @@ from vocode.streaming.models.actions import (
 )
 from .custom_models import MyActionType
 
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 class SendGridSendEmailActionConfig(ActionConfig, type=MyActionType.SENDGRID_SEND_EMAIL):
   pass
 
@@ -27,7 +31,7 @@ class SendGridSendEmail(
       SendGridSendEmailActionConfig, SendGridSendEmailParameters, SendGridSendEmailResponse
       ]):
   description: str = "Sends an email"
-  parmeters_type: Type[SendGridSendEmailParameters] = SendGridSendEmailParameters
+  parameters_type: Type[SendGridSendEmailParameters] = SendGridSendEmailParameters
   response_type: Type[SendGridSendEmailResponse] = SendGridSendEmailResponse
 
   async def run(self, action_input: ActionInput[SendGridSendEmailParameters]) -> ActionOutput[SendGridSendEmailResponse]:
@@ -42,20 +46,21 @@ class SendGridSendEmail(
     
       sg = SendGridAPIClient(sendgrid_api_key)
       response = sg.send(message)
-      logging.info(f"Email sent successfully. StatusCode: {response.status_code}")
-
+      logging.DEBUG(f"Email sent successfully. StatusCode: {response.status_code}")
       return ActionOutput(action_type=self.action_config.type, response=SendGridSendEmailResponse(success=True, message="Successfully sent Email."))
 
 # TODO: replace bare exception with specific exception
     except RuntimeError as e:
-      logging.error(f"Failed to send Email: {e}")
+      logging.ERROR(f"Failed to send Email: {e}")
+      print(f"Failed to send Email: {e}")
       return ActionOutput(action_type=self.action_config.type, response=SendGridSendEmailResponse(success=False, message="Failed to send Email"))
     
-  def _user_message_param_info(self):
-        return {
-            "type": "string",
-            "description": """
-            Let me send the email for you 
-            """,
-        }
+    # TODO: make the say message work
+  # def _user_message_param_info(self):
+  #       return {
+  #           "type": "string",
+  #           "description": """
+  #           Let me send the email using sendgrid for you 
+  #           """,
+  #       }
   

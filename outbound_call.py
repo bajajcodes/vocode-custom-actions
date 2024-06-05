@@ -1,23 +1,23 @@
 import os
+
 from dotenv import load_dotenv
-
-load_dotenv()
-
-from vocode.streaming.telephony.conversation.outbound_call import OutboundCall
-from vocode.streaming.telephony.config_manager.redis_config_manager import RedisConfigManager
 from langchain.memory import ConversationBufferMemory
-from vocode.streaming.models.agent import ChatGPTAgentConfig
+from vocode.streaming.models.message import BaseMessage
 from vocode.streaming.models.synthesizer import AzureSynthesizerConfig
 from vocode.streaming.models.telephony import TwilioConfig
-from vocode.streaming.models.transcriber import DeepgramTranscriberConfig
-from vocode.streaming.models.message import BaseMessage
-from vocode.streaming.models.agent import FillerAudioConfig
-from prompt import SENDS_AN_SMS_PROMPT, SENDS_AN_EMAIL_PROMPT, VOICE_AI_ACTIONS_PROMPT
-from vocode.streaming.action.nylas_send_email import NylasSendEmailActionConfig
+from vocode.streaming.models.transcriber import (DeepgramTranscriberConfig,
+                                                 TimeEndpointingConfig)
+from vocode.streaming.telephony.config_manager.redis_config_manager import \
+    RedisConfigManager
+from vocode.streaming.telephony.conversation.outbound_call import OutboundCall
+
 from agent_actions.custom_agent import MyChatGPTAgentConfig
-from agent_actions.twilio_send_sms import TwilioSendSmsActionConfig
 from agent_actions.sendgrid_send_email import SendGridSendEmailActionConfig
-from vocode.streaming.models.transcriber import TimeEndpointingConfig
+from agent_actions.twilio_send_sms import TwilioSendSmsActionConfig
+from prompt import (SENDS_AN_EMAIL_PROMPT, SENDS_AN_SMS_PROMPT,
+                    VOICE_AI_ACTIONS_PROMPT)
+
+load_dotenv()
 
 BASE_URL = os.environ["BASE_URL"]
 TWILIO_FROM_NUMBER=os.environ["TWILIO_FROM_NUMBER"]

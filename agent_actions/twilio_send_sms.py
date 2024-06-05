@@ -1,13 +1,11 @@
-import os
 import logging
+import os
 from typing import Type
+
 from pydantic import BaseModel, Field
 from vocode.streaming.action.base_action import BaseAction
-from vocode.streaming.models.actions import (
-    ActionConfig,
-    ActionInput,
-    ActionOutput,
-)
+from vocode.streaming.models.actions import ActionConfig, ActionInput, ActionOutput
+
 from .custom_models import MyActionType
 
 
@@ -39,32 +37,48 @@ class TwilioSendSms(
     ) -> ActionOutput[TwilioSendSmsResponse]:
         from twilio.rest import Client
 
-        account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-        auth_token = os.getenv('TWILIO_AUTH_TOKEN')  
+        account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        auth_token = os.getenv("TWILIO_AUTH_TOKEN")
         from_number = os.getenv("TWILIO_FROM_NUMBER")
 
         try:
-            # Initialize the Nylas client      
+            # Initialize the Nylas client
             client = Client(account_sid, auth_token)
-            logging.info(f"Sending SMS to: {action_input.params.to}, Body: {action_input.params.body}")
+            logging.info(
+                f"Sending SMS to: {action_input.params.to}, Body: {action_input.params.body}"
+            )
 
             # Send the sms
-            message = client.messages.create(from_=from_number,body=action_input.params.body, to="+91{}".format(action_input.params.to))
+            message = client.messages.create(
+                from_=from_number,
+                body=action_input.params.body,
+                to="+91{}".format(action_input.params.to),
+            )
             logging.info(f"SMS sent successfully. SID: {message.sid}")
 
-            return ActionOutput(action_type=self.action_config.type, response=TwilioSendSmsResponse(success=True, message="Successfully sent SMS."))
-        
-# TODO: replace bare exception with specific exception
+            return ActionOutput(
+                action_type=self.action_config.type,
+                response=TwilioSendSmsResponse(
+                    success=True, message="Successfully sent SMS."
+                ),
+            )
+
+        # TODO: replace bare exception with specific exception
         except RuntimeError as e:
             logging.error(f"Failed to send SMS: {e}")
-            return ActionOutput(action_type=self.action_config.type, response=TwilioSendSmsResponse(success=False, message="Failed to send SMS"))
-        
+            return ActionOutput(
+                action_type=self.action_config.type,
+                response=TwilioSendSmsResponse(
+                    success=False, message="Failed to send SMS"
+                ),
+            )
+
+
 # TODO: make the say message work
-    # def _user_message_param_info(self):
-    #     return {
-    #         "type": "string",
-    #         "description": """
-    #         Let me send the sms for you
-    #         """,
-    #     }
-    
+# def _user_message_param_info(self):
+#     return {
+#         "type": "string",
+#         "description": """
+#         Let me send the sms for you
+#         """,
+#     }

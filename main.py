@@ -3,15 +3,13 @@ import os
 import sys
 
 import uvicorn
-
 # Third-party imports
 from fastapi import FastAPI
-from vocode.streaming.telephony.config_manager.redis_config_manager import (
-    RedisConfigManager,
-)
+from vocode.streaming.telephony.config_manager.redis_config_manager import \
+    RedisConfigManager
 from vocode.streaming.telephony.server.base import TelephonyServer
 
-from .agent_actions.custom_agent_factory import MyAgentFactory
+from agent_actions.custom_agent_factory import MyAgentFactory
 
 # if running from python, this will load the local .env
 # docker-compose will load the .env file by itself

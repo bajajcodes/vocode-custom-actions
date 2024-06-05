@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from langchain.memory import ConversationBufferMemory
+from vocode.streaming.models.agent import CutOffResponse
 from vocode.streaming.models.message import BaseMessage
 from vocode.streaming.models.synthesizer import AzureSynthesizerConfig
 from vocode.streaming.models.telephony import TwilioConfig
@@ -14,8 +15,8 @@ from vocode.streaming.telephony.conversation.outbound_call import OutboundCall
 from agent_actions.custom_agent import MyChatGPTAgentConfig
 from agent_actions.sendgrid_send_email import SendGridSendEmailActionConfig
 from agent_actions.twilio_send_sms import TwilioSendSmsActionConfig
-from prompt import (SENDS_AN_EMAIL_PROMPT, SENDS_AN_SMS_PROMPT,
-                    VOICE_AI_ACTIONS_PROMPT)
+from prompt import (SALES_CALL_PROMPT, SENDS_AN_EMAIL_PROMPT,
+                    SENDS_AN_SMS_PROMPT, VOICE_AI_ACTIONS_PROMPT)
 
 load_dotenv()
 
@@ -53,19 +54,21 @@ async def main():
             audio_encoding="mulaw",
             model="nova-2-conversationalai",
             min_interrupt_confidence=1,
-            endpointing_config=TimeEndpointingConfig(time_cutoff_seconds=0.5)
+            mute_during_speech=True,
+            endpointing_config=TimeEndpointingConfig(time_cutoff_seconds=0.6)
         ),
         agent_config=MyChatGPTAgentConfig(
             # send_filler_audio=FillerAudioConfig(use_typing_noise=True),
             initial_message=BaseMessage(text="Hello?"),
-            prompt_preamble=VOICE_AI_ACTIONS_PROMPT,
+            prompt_preamble=SALES_CALL_PROMPT,
             model_name="gpt-4-turbo",
             temperature=0.1,
             generate_responses=True,
             allow_agent_to_be_cut_off=True,
+            cut_off_response=CutOffResponse(),
             track_bot_sentiment=True,
             actions=[TwilioSendSmsActionConfig(),SendGridSendEmailActionConfig()],
-            allowed_idle_time_seconds=5,
+            allowed_idle_time_seconds=10,
             memory=memory,
         )
     )

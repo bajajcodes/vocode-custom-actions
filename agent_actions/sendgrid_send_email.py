@@ -4,9 +4,8 @@ from typing import Type
 
 from pydantic import BaseModel, Field
 from vocode.streaming.action.base_action import BaseAction
-from vocode.streaming.models.actions import ActionConfig, ActionInput, ActionOutput
-
-from vocode.streaming.models.actions import ActionConfig, ActionInput, ActionOutput
+from vocode.streaming.models.actions import (ActionConfig, ActionInput,
+                                             ActionOutput)
 
 from .custom_models import MyActionType
 
@@ -43,6 +42,7 @@ class SendGridSendEmail(
     parameters_type: Type[SendGridSendEmailParameters] = SendGridSendEmailParameters
     response_type: Type[SendGridSendEmailResponse] = SendGridSendEmailResponse
 
+# TODO: add loggers
     async def run(
         self, action_input: ActionInput[SendGridSendEmailParameters]
     ) -> ActionOutput[SendGridSendEmailResponse]:
@@ -62,9 +62,7 @@ class SendGridSendEmail(
 
             sg = SendGridAPIClient(sendgrid_api_key)
             response = sg.send(message)
-            logging.DEBUG(
-                f"Email sent successfully. StatusCode: {response.status_code}"
-            )
+
             return ActionOutput(
                 action_type=self.action_config.type,
                 response=SendGridSendEmailResponse(
@@ -74,7 +72,6 @@ class SendGridSendEmail(
 
         # TODO: replace bare exception with specific exception
         except RuntimeError as e:
-            logging.ERROR(f"Failed to send Email: {e}")
             print(f"Failed to send Email: {e}")
             return ActionOutput(
                 action_type=self.action_config.type,

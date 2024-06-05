@@ -4,7 +4,8 @@ from typing import Type
 
 from pydantic import BaseModel, Field
 from vocode.streaming.action.base_action import BaseAction
-from vocode.streaming.models.actions import ActionConfig, ActionInput, ActionOutput
+from vocode.streaming.models.actions import (ActionConfig, ActionInput,
+                                             ActionOutput)
 
 from .custom_models import MyActionType
 
@@ -31,7 +32,7 @@ class TwilioSendSms(
     description: str = "Sends an sms."
     parameters_type: Type[TwilioSendSmsParameters] = TwilioSendSmsParameters
     response_type: Type[TwilioSendSmsResponse] = TwilioSendSmsResponse
-
+# TODO: add loggers
     async def run(
         self, action_input: ActionInput[TwilioSendSmsParameters]
     ) -> ActionOutput[TwilioSendSmsResponse]:
@@ -54,7 +55,6 @@ class TwilioSendSms(
                 body=action_input.params.body,
                 to="+91{}".format(action_input.params.to),
             )
-            logging.info(f"SMS sent successfully. SID: {message.sid}")
 
             return ActionOutput(
                 action_type=self.action_config.type,
@@ -65,7 +65,7 @@ class TwilioSendSms(
 
         # TODO: replace bare exception with specific exception
         except RuntimeError as e:
-            logging.error(f"Failed to send SMS: {e}")
+            print(f"Failed to send SMS: {e}")
             return ActionOutput(
                 action_type=self.action_config.type,
                 response=TwilioSendSmsResponse(

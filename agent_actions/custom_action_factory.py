@@ -9,6 +9,6 @@ class MyActionFactory:
       if isinstance(action_config, TwilioSendSmsActionConfig):
          return TwilioSendSms(action_config=action_config, should_respond=True)
       if (isinstance(action_config, SendGridSendEmailActionConfig)):
-         return SendGridSendEmail(action_config=action_config, should_response=True)
+         return SendGridSendEmail(action_config=action_config, should_respond=True)
       else:
          raise Exception("Invalid custom action type")

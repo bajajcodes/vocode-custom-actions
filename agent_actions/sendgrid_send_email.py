@@ -46,13 +46,20 @@ class SendGridSendEmail(
     async def run(
         self, action_input: ActionInput[SendGridSendEmailParameters]
     ) -> ActionOutput[SendGridSendEmailResponse]:
-        from sendgrid import SendGridAPIClient
-        from sendgrid.helpers.mail import Mail
+        import base64
+        import os
 
+        import requests
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import (Attachment, Disposition,
+                                           FileContent, FileName, FileType,
+                                           Mail)
+        
         sendgrid_api_key = os.environ.get("SENDGRID_API_KEY")
         from_email = os.environ.get("SENDGRID_FROM_EMAIL")
 
         try:
+        
             message = Mail(
                 from_email=from_email,
                 to_emails=action_input.params.recipient_email,
@@ -60,9 +67,22 @@ class SendGridSendEmail(
                 html_content=action_input.params.body,
             )
 
+            with open('./tests/AHS-Spring-Catalog (1).pdf', 'rb') as f:
+                data = f.read()
+                f.close()
+            encoded_file = base64.b64encode(data).decode()
+
+            attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName('AHS-Spring-Catalog (1).pdf'),
+                FileType('application/pdf'),
+                Disposition('attachment')
+            )
+            message.attachment = attachedFile
             sg = SendGridAPIClient(sendgrid_api_key)
             response = sg.send(message)
-
+            print(response.status_code, response.body, response.headers)
+            
             return ActionOutput(
                 action_type=self.action_config.type,
                 response=SendGridSendEmailResponse(

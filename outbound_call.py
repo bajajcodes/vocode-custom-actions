@@ -8,6 +8,7 @@ from vocode.streaming.models.synthesizer import AzureSynthesizerConfig
 from vocode.streaming.models.telephony import TwilioConfig
 from vocode.streaming.models.transcriber import (DeepgramTranscriberConfig,
                                                  TimeEndpointingConfig)
+from vocode.streaming.models.vector_db import PineconeConfig
 from vocode.streaming.telephony.config_manager.redis_config_manager import \
     RedisConfigManager
 from vocode.streaming.telephony.conversation.outbound_call import OutboundCall
@@ -25,6 +26,13 @@ TWILIO_FROM_NUMBER=os.environ["TWILIO_FROM_NUMBER"]
 TWILIO_TO_NUMBER=os.environ["TWILIO_TO_NUMBER"]
 TWILIO_ACCOUNT_SID=os.environ["TWILIO_ACCOUNT_SID"] 
 TWILIO_AUTH_TOKEN=os.environ["TWILIO_AUTH_TOKEN"] 
+
+# Ensure that the environment variable 'PINECONE_INDEX_NAME' is not None
+pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
+if pinecone_index_name is None:
+    raise ValueError("Environment variable 'PINECONE_INDEX_NAME' is not set.")
+
+vector_db_config = PineconeConfig(index=pinecone_index_name,embeddings_model="text-embedding-3-small")
 
 
 async def main():
@@ -53,13 +61,12 @@ async def main():
             chunk_size=20 * 160,
             audio_encoding="mulaw",
             model="nova-2-conversationalai",
-            min_interrupt_confidence=1,
-            mute_during_speech=True,
+            min_interrupt_confidence=0.9,
             endpointing_config=TimeEndpointingConfig(time_cutoff_seconds=0.6)
         ),
         agent_config=MyChatGPTAgentConfig(
             # send_filler_audio=FillerAudioConfig(use_typing_noise=True),
-            initial_message=BaseMessage(text="Hello?"),
+            initial_message=BaseMessage(text="Hello, I am Nisha."),
             prompt_preamble=SALES_CALL_PROMPT,
             model_name="gpt-4-turbo",
             temperature=0.1,
@@ -70,6 +77,7 @@ async def main():
             actions=[TwilioSendSmsActionConfig(),SendGridSendEmailActionConfig()],
             allowed_idle_time_seconds=10,
             memory=memory,
+            vector_db_config=vector_db_config
         )
     )
 
